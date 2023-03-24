@@ -2,7 +2,7 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!--  Elevation  -->
-    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_elevation">8dp</dimen>
 
     <!-- Grid -->
     <dimen name="grid_0">0dp</dimen>
