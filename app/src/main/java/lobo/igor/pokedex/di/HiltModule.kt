@@ -1,11 +1,12 @@
 package lobo.igor.pokedex.di
 
+import com.apollographql.apollo3.ApolloClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import lobo.igor.pokedex.BASE_URL
-import lobo.igor.pokedex.data.api.PokemonApi
+import lobo.igor.pokedex.GRAPHQL_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -30,9 +31,9 @@ object HiltModule {
         Retrofit.Builder().baseUrl(BASE_URL).client(client)
             .addConverterFactory(GsonConverterFactory.create()).build()
 
-    @Singleton
     @Provides
-    fun providePokemonApi(retrofit: Retrofit): PokemonApi {
-        return retrofit.create(PokemonApi::class.java)
+    @Singleton
+    fun provideApolloClient(): ApolloClient {
+        return ApolloClient.Builder().serverUrl(GRAPHQL_BASE_URL).build()
     }
 }

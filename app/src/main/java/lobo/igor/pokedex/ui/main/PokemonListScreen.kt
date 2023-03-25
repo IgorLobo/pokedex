@@ -1,5 +1,6 @@
 package lobo.igor.pokedex.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -52,10 +56,12 @@ fun PokemonListScreen(viewModel: PokemonListViewModel = viewModel()) {
 
 @Composable
 fun PokemonList(data: List<PokemonListItem>) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(data) { pokemon ->
@@ -63,9 +69,7 @@ fun PokemonList(data: List<PokemonListItem>) {
                 modifier = Modifier.fillMaxWidth(),
                 elevation = dimensionResource(id = R.dimen.card_elevation),
             ) {
-                Row(
-                    verticalAlignment = Alignment.Top
-                ) {
+                Box {
                     Text(
                         text = "#${pokemon.number}",
                         modifier = Modifier.padding(start = 8.dp, top = 8.dp),
@@ -81,8 +85,7 @@ fun PokemonList(data: List<PokemonListItem>) {
                             contentDescription = null
                         )
                         Text(
-                            text = pokemon.name,
-                            style = MaterialTheme.typography.h6
+                            text = pokemon.name, style = MaterialTheme.typography.h6
                         )
 
                     }
