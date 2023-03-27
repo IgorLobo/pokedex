@@ -1,111 +1,151 @@
 package lobo.igor.pokedex.ui.main
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import lobo.igor.pokedex.R
-import lobo.igor.pokedex.data.UiState
+import coil.request.ImageRequest
 import lobo.igor.pokedex.data.model.PokemonListItem
+import lobo.igor.pokedex.data.model.PokemonTypeEnum
+import lobo.igor.pokedex.ui.PokemonTypeInfoView
+import lobo.igor.pokedex.util.capitalize
+import lobo.igor.pokedex.util.color
 
 @Composable
 fun PokemonListScreen(viewModel: PokemonListViewModel = viewModel()) {
-    when (val state = viewModel.uiState.collectAsState().value) {
-        is UiState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        is UiState.Success -> {
-            PokemonList(state.data)
-        }
-        is UiState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-            ) {
-                Text(text = state.message)
+    val data = viewModel.pokemons.collectAsLazyPagingItems()
+
+    PokemonList(data)
+
+    when(val state = data.loadState.refresh) {
+        is LoadState.Error -> ErrorState(state.error.message.orEmpty())
+        is LoadState.Loading -> LoadingState()
+        else -> {}
+    }
+
+    when (val state = data.loadState.append) {
+        is LoadState.Error -> ErrorState(state.error.message.orEmpty())
+        is LoadState.Loading -> LoadingState()
+        else -> {}
+    }
+}
+
+@Composable
+fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorState(message: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+    ) {
+        Text(text = message)
+    }
+}
+
+@Composable
+fun PokemonList(data: LazyPagingItems<PokemonListItem>) {
+    Column {
+        Text(
+            text = "Pokedex",
+            style = MaterialTheme.typography.h3,
+            modifier = Modifier.padding(8.dp),
+            fontWeight = FontWeight.Bold
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(data.itemCount) { index ->
+                data[index]?.let { PokemonCard(it) }
             }
         }
     }
 }
 
 @Composable
-fun PokemonList(data: List<PokemonListItem>) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+fun PokemonCard(pokemon: PokemonListItem) {
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .fillMaxWidth()
+            .height(130.dp),
+        shape = RoundedCornerShape(20.dp),
+        backgroundColor = Color(pokemon.types.first().colorHex.color())
     ) {
-        items(data) { pokemon ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = dimensionResource(id = R.dimen.card_elevation),
-            ) {
-                Box {
-                    Text(
-                        text = "#${pokemon.number}",
-                        modifier = Modifier.padding(start = 8.dp, top = 8.dp),
-                        style = MaterialTheme.typography.h6
-                    )
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        AsyncImage(
-                            model = pokemon.image,
-                            modifier = Modifier.size(200.dp),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = pokemon.name, style = MaterialTheme.typography.h6
-                        )
-
+        Box {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = pokemon.name.capitalize(),
+                    style = MaterialTheme.typography.body1,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyColumn {
+                    items(pokemon.types) { type ->
+                        PokemonTypeInfoView(type, PaddingValues(bottom = 4.dp))
                     }
                 }
             }
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(pokemon.image).crossfade(true).build(),
+                modifier = Modifier
+                    .size(90.dp)
+                    .align(Alignment.BottomEnd),
+                contentDescription = null
+            )
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
-fun sucessPreview() {
+fun SucessPreview() {
     MaterialTheme {
         val pokemonList = listOf(
-            PokemonListItem("Charmander", 1),
-            PokemonListItem("Charmeleon", 1),
-            PokemonListItem("Charizard", 1),
-            PokemonListItem("Bulbassauro", 1),
+            PokemonListItem("Bulbassaur", 1, listOf(PokemonTypeEnum.GRASS, PokemonTypeEnum.POISON)),
+            PokemonListItem("Ivyssaur", 2, listOf(PokemonTypeEnum.GRASS, PokemonTypeEnum.POISON)),
+            PokemonListItem("Venussaur", 3, listOf(PokemonTypeEnum.GRASS, PokemonTypeEnum.POISON)),
+            PokemonListItem("Charmander", 4, listOf(PokemonTypeEnum.FIRE)),
+            PokemonListItem("Charmeleon", 5, listOf(PokemonTypeEnum.FIRE)),
+            PokemonListItem("Charizard", 6, listOf(PokemonTypeEnum.FIRE, PokemonTypeEnum.FLYING)),
         )
-        PokemonList(data = pokemonList)
+//        PokemonList(data = pokemonList)
     }
 }

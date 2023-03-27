@@ -6,26 +6,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import lobo.igor.pokedex.PokemonOriginalQuery
 import lobo.igor.pokedex.data.model.PokemonListItem
-import lobo.igor.pokedex.data.model.PokemonListResult
+import lobo.igor.pokedex.data.model.PokemonTypeEnum
 import javax.inject.Inject
 
 class PokemonRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient
 ) : PokemonRepository {
-    override suspend fun getAll(): Result<PokemonListResult> {
+    override suspend fun getAll(generation: Int): List<PokemonListItem> {
         return withContext(Dispatchers.IO) {
-            val response = apolloClient.query(PokemonOriginalQuery()).execute()
+            val response = apolloClient.query(PokemonOriginalQuery(generation)).execute()
 
-            if (!response.hasErrors()) {
-                response.data!!.run {
-                    val data = PokemonListResult(
-                        count = info.total!!.count,
-                        results = pokemons.map { PokemonListItem(it.name, it.id) }
+            if (response.hasErrors().not()) {
+                response.data!!.pokemons.map {
+                    PokemonListItem(
+                        it.name,
+                        it.id,
+                        it.detail.first().types.map { type -> PokemonTypeEnum.fromName(type.type?.name) }
                     )
-                    Result.success(data)
                 }
             } else {
-                Result.failure(ApolloException("Failure"))
+                throw ApolloException(response.errors?.joinToString { it.message } ?: "Generic error")
             }
         }
     }

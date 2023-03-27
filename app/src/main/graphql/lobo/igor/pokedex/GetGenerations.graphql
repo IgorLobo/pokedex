@@ -1,0 +1,12 @@
+query GetGenerations {
+    info: pokemon_v2_generationname_aggregate(where: {pokemon_v2_language: {id: {_eq: 9}}}) {
+        total: aggregate {
+            count
+        }
+    }
+    data: pokemon_v2_generationname(where: {pokemon_v2_language: {id: {_eq: 9}}}) {
+        name
+        id
+        generation_id
+    }
+}

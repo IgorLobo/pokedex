@@ -1,12 +1,15 @@
 package lobo.igor.pokedex.di
 
 import com.apollographql.apollo3.ApolloClient
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import lobo.igor.pokedex.BASE_URL
 import lobo.igor.pokedex.GRAPHQL_BASE_URL
+import lobo.igor.pokedex.data.repository.PokemonRepository
+import lobo.igor.pokedex.data.repository.PokemonRepositoryImpl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
