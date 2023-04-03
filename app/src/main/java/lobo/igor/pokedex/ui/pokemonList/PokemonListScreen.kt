@@ -1,4 +1,4 @@
-package lobo.igor.pokedex.ui.main
+package lobo.igor.pokedex.ui.pokemonList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -35,12 +35,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import lobo.igor.pokedex.data.model.PokemonListItem
 import lobo.igor.pokedex.data.model.PokemonTypeEnum
-import lobo.igor.pokedex.ui.PokemonTypeInfoView
 import lobo.igor.pokedex.util.capitalize
 import lobo.igor.pokedex.util.color
 
 @Composable
-fun PokemonListScreen(viewModel: PokemonListViewModel = viewModel()) {
+fun PokemonListScreen(viewModel: PokemonListViewModel = hiltViewModel()) {
     val data = viewModel.pokemons.collectAsLazyPagingItems()
 
     PokemonList(data)

@@ -1,4 +1,4 @@
-package lobo.igor.pokedex.ui.main
+package lobo.igor.pokedex.ui.pokemonList
 
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager

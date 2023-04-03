@@ -1,4 +1,4 @@
-package lobo.igor.pokedex.ui
+package lobo.igor.pokedex.ui.pokemonList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues

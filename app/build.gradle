@@ -21,9 +21,6 @@ android {
             useSupportLibrary true
         }
     }
-    buildFeatures {
-        viewBinding true
-    }
     buildTypes {
         release {
             minifyEnabled true
@@ -34,13 +31,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
-    }
-
-    dataBinding {
-        enabled = true
-    }
-    viewBinding {
-        enabled = true
     }
     namespace 'lobo.igor.pokedex'
     packagingOptions {
@@ -86,10 +76,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 
-//    Navigation
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -101,13 +87,14 @@ dependencies {
     //Hilt
     implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
     // Compose
     implementation "androidx.compose.ui:ui:1.4.0-rc01"
     implementation "androidx.compose.ui:ui-tooling:1.4.0-rc01"
     implementation "androidx.compose.material:material:1.4.0-rc01"
     implementation "androidx.activity:activity-compose:1.6.1"
-    implementation "io.coil-kt:coil-compose:2.2.2"
+    implementation "androidx.navigation:navigation-compose:2.6.0-alpha08"
 
     // Apollo GraphQL
     implementation "com.apollographql.apollo3:apollo-runtime:3.7.5"
